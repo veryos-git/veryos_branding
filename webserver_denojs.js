@@ -37,6 +37,13 @@ let f_handler = async function(o_request) {
 
         o_socket.onopen = function() {
             console.log('websocket connected');
+
+            // read data and send to client 
+            let a_o_config = f_v_crud__indb('read', f_o_model__from_s_name_table('o_config'), {});
+            o_socket.send(JSON.stringify({
+                s_type: 'o_config',
+                a_o_config,
+            }));
         };
 
         o_socket.onmessage = async function(o_evt) {

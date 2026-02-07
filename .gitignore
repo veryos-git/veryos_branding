@@ -1,2 +1,4 @@
 # ignore all files or folders containing '*.gitignored*' in their path
 *gitignored*
+# ignore python venv
+venv/
