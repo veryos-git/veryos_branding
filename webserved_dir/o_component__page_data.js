@@ -231,6 +231,7 @@ let o_component__page_data = {
         },
 
         f_handle_message: function(o_data) {
+            debugger
             if(o_data.s_type === 'delete_table_data'){
                 if (o_data.s_error) {
                     this.f_db_message(o_data.s_error, true);
@@ -242,8 +243,6 @@ let o_component__page_data = {
                 }
                 return;
             }
-            if (o_data.s_type !== 'crud') return;
-            if (o_data.s_name_table === s_name_table__config) return;
 
             if (o_data.s_error) {
                 this.f_db_message(o_data.s_error, true);

@@ -81,6 +81,10 @@ use Vue.js 3 for the frontend
 in linux a file and  a folder are basically both a node with the only difference that a folder 
 can have children . that is why we renamed the model 'o_file' to 'o_fsnode'
 
+
+### request reponse with websocket
+implement a simple basic generic request response mechanism with websocket. i can imagine a request having a UUID as a identifier to respond to a certain request. 
+
 ### analyze files
 data persistance:
 - when the path has been changed and 'f_a_o_file' has been clicked. the path should be written to the config. when the page is reloaded that path should be read from config

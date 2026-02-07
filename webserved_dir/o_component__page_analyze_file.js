@@ -36,7 +36,7 @@ let o_component__page_analyze_file = {
     data: function() {
         return {
             o_state__ws: o_state__ws,
-            s_path: '',
+            s_path: o_app.o_config.s_path_last_opened,
             a_o_fsnode: [],
             s_error__tree: '',
             b_loading__tree: false,

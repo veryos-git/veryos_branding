@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import { o_router } from './o_router.js';
 import { o_state as o_state__ws, f_connect } from './o_service__websocket.js';
+import { o_config__default } from './constructors.module.js';
 
 let o_app = createApp({
     data: function() {
@@ -11,6 +12,7 @@ let o_app = createApp({
                 { s_key: 'data', s_label: 'Data' },
                 { s_key: 'configuration', s_label: 'Configuration' },
             ],
+            o_config__default: 
         };
     },
     template: `
@@ -38,6 +40,6 @@ let o_app = createApp({
         f_connect();
     },
 });
-
+globalThis.o_app = o_app;
 o_app.use(o_router);
 o_app.mount('#app');

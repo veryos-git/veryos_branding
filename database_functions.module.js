@@ -4,12 +4,14 @@ import {
     a_o_model,
     f_s_name_table__from_o_model,
     f_s_name_foreign_key__from_o_model,
-    o_model__o_config
+    o_model__o_config,
+    o_config__default,
 } from "./webserved_dir/constructors.module.js";
 
 let o_db = null;
 
-let f_init_db = function(s_path_db = './media_analyser.db') {
+let s_path_database = './.gitignored/media_analyser.db';
+let f_init_db = async function(s_path_db = s_path_database) {
     o_db = new Database(s_path_db);
 
     for (let o_model of a_o_model) {
@@ -45,13 +47,11 @@ let f_init_db = function(s_path_db = './media_analyser.db') {
     }
 
     // ensure a default config row exists
-    let o_row = o_db.prepare(`SELECT * FROM ${f_s_name_table__from_o_model(o_model__o_config)} WHERE n_id = ?`).get(1);
-    if (!o_row) {
-        o_db.prepare(
-            `INSERT INTO ${f_s_name_table__from_o_model(o_model__o_config)} (n_id, s_path_last_opened, a_s_filter_extension) VALUES (?, ?, ?)`
-        ).run(1, '', JSON.stringify(['mp4', 'jpg', 'jpeg', 'png', 'gif']));
+    let o_config__default_fromdb = (await f_v_crud__indb('read', o_model__o_config, { n_id: o_config__default.n_id }))?.at(0);
+    if(!o_config__default_fromdb){
+        await f_v_crud__indb('create', o_model__o_config, o_config__default);
     }
-
+    console.log(o_config__default_fromdb);
     return o_db;
 };
 

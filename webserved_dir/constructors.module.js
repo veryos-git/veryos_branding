@@ -64,6 +64,12 @@ let o_model__o_config = f_o_model({
         f_o_modprop('a_s_filter_extension', 'array'),
     ]
 })
+let o_config__default = f_o_model_instance(o_model__o_config, {
+    n_id: 1,
+    s_path_last_opened: '/tmp',
+    a_s_filter_extension: ['mp4', 'jpg', 'jpeg', 'png', 'gif'],
+});
+
 let o_model__o_fsnode = f_o_model({
     s_name: 'o_fsnode',
     a_o_property: [
@@ -139,5 +145,6 @@ export {
     f_s_name_table__from_o_model,
     f_s_name_foreign_key__from_o_model,
     f_o_model_instance,
-    f_o_model__from_s_name_table
+    f_o_model__from_s_name_table,
+    o_config__default
 }
