@@ -1,0 +1,238 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: monospace;
+    background: #1a1a2e;
+    color: #e0e0e0;
+}
+
+/* navigation */
+nav {
+    display: flex;
+    background: #0f3460;
+    border-bottom: 2px solid #533483;
+}
+.nav_item {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    color: #8a8a8a;
+    font-family: monospace;
+    font-size: 14px;
+    cursor: pointer;
+}
+.nav_item:hover {
+    color: #e0e0e0;
+    background: #16213e;
+}
+.nav_item.active {
+    color: #e0e0e0;
+    background: #1a1a2e;
+    border-bottom: 2px solid #e94560;
+    margin-bottom: -2px;
+}
+
+/* pages */
+.page__content {
+    padding: 20px;
+}
+
+/* shared form styles */
+.input {
+    padding: 8px 12px;
+    font-family: monospace;
+    font-size: 14px;
+    background: #16213e;
+    color: #e0e0e0;
+    border: 1px solid #0f3460;
+    border-radius: 4px;
+}
+.btn {
+    padding: 8px 16px;
+    font-family: monospace;
+    font-size: 14px;
+    background: #0f3460;
+    color: #e0e0e0;
+    border: 1px solid #533483;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn:hover {
+    background: #533483;
+}
+
+/* analyze files page */
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.controls .input {
+    flex: 1;
+}
+.container__tree {
+    padding: 10px;
+    background: #16213e;
+    border: 1px solid #0f3460;
+    border-radius: 4px;
+    min-height: 100px;
+}
+.entry__directory {
+    cursor: pointer;
+    padding: 3px 0;
+    user-select: none;
+}
+.entry__directory:hover {
+    color: #e94560;
+}
+.entry__file {
+    padding: 3px 0;
+    color: #8a8a8a;
+}
+.indicator {
+    display: inline-block;
+    width: 16px;
+    text-align: center;
+    margin-right: 4px;
+}
+
+/* configuration page */
+.form_group {
+    margin-bottom: 16px;
+}
+.form_group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #8a8a8a;
+    font-size: 12px;
+}
+.form_group .input {
+    width: 100%;
+    max-width: 600px;
+}
+.message {
+    margin-top: 12px;
+    font-size: 12px;
+}
+.message.success {
+    color: #4ecca3;
+}
+.message.error {
+    color: #e94560;
+}
+
+/* data page */
+.db_table_selector {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.btn__table {
+    padding: 6px 14px;
+    font-family: monospace;
+    font-size: 13px;
+    background: #16213e;
+    color: #8a8a8a;
+    border: 1px solid #0f3460;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn__table:hover {
+    color: #e0e0e0;
+    border-color: #533483;
+}
+.btn__table.active {
+    background: #0f3460;
+    color: #e0e0e0;
+    border-color: #e94560;
+}
+.db_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.db_table th {
+    background: #0f3460;
+    color: #8a8a8a;
+    padding: 6px 10px;
+    text-align: left;
+    border: 1px solid #0a1a3a;
+    font-weight: normal;
+}
+.db_table td {
+    padding: 5px 10px;
+    border: 1px solid #0a1a3a;
+    background: #16213e;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.db_table tr:hover td {
+    background: #1a2744;
+}
+.db_table td .cell_input {
+    width: 100%;
+    padding: 3px 6px;
+    font-family: monospace;
+    font-size: 13px;
+    background: #0f1a30;
+    color: #e0e0e0;
+    border: 1px solid #533483;
+    border-radius: 2px;
+}
+.db_actions {
+    white-space: nowrap;
+}
+.btn__sm {
+    padding: 3px 8px;
+    font-family: monospace;
+    font-size: 11px;
+    background: #0f3460;
+    color: #8a8a8a;
+    border: 1px solid #0a1a3a;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-left: 2px;
+}
+.btn__sm:hover {
+    color: #e0e0e0;
+    background: #533483;
+}
+.btn__sm.danger:hover {
+    background: #e94560;
+    color: #fff;
+}
+.btn__sm.confirm {
+    background: #1a5c3a;
+    color: #4ecca3;
+}
+.db_toolbar {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.container__db_table {
+    overflow-x: auto;
+}
+.message__db {
+    margin-left: 10px;
+}
+
+/* status bar */
+#el_status {
+    padding: 4px 20px;
+    font-size: 11px;
+    color: #8a8a8a;
+    background: #0f0f1a;
+    border-top: 1px solid #0f3460;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
