@@ -144,3 +144,10 @@ on the image viewer there should be the number of analyzed files
 in the image viewer the property 'a_o_image__data' can be renamed to simply 'a_o_image'
 then if the a_o_image array is like thousands of images, it takes to much time to filter them all, so there should be a selector where a user can select ranges , like 0-100, 101-200, 201-300... 
  
+
+ ### pose estimation for many files
+ if there are to many files the pose estimation wont work because the command line argument will get to large. so we have to split the estimation in multiple batches
+
+
+ ### cdn to downloaded files 
+ we currently use cdn's (vue.js for example). these libraries should be hostet on the denojs webserver itself, internet/cdn dependency is not accepted

@@ -151,107 +151,118 @@ let f_a_o_pose_from_a_o_img = async function(a_o_image, f_on_progress = null){
     return a_o_pose__result;
   }
 
-  // build paths for python script
-  let a_s_path = a_o_image__to_process.map(function(o_image){ return o_image.s_path_absolute; });
   let s_path_model_dir = s_root_dir + s_ds + '.gitignored' + s_ds + 'models';
   let s_path_script = s_root_dir + s_ds + 'imageanalysis' + s_ds + 'vitpose_batch_processing.py';
 
-  console.log(`Running pose estimation on ${a_s_path.length} images...`);
-  if(f_on_progress) f_on_progress('loading AI models...');
+  // split into batches to avoid exceeding OS ARG_MAX limit
+  let n_sz__batch = 50;
+  let n_cnt__batch = Math.ceil(a_o_image__to_process.length / n_sz__batch);
 
-  let o_command = new Deno.Command("python3", {
-    args: [s_path_script, '--model-dir', s_path_model_dir, ...a_s_path],
-    stdout: "piped",
-    stderr: "piped",
-  });
+  for(let n_idx__batch = 0; n_idx__batch < n_cnt__batch; n_idx__batch++){
+    let n_idx__start = n_idx__batch * n_sz__batch;
+    let a_o_image__batch = a_o_image__to_process.slice(n_idx__start, n_idx__start + n_sz__batch);
+    let a_s_path = a_o_image__batch.map(function(o_image){ return o_image.s_path_absolute; });
+    let s_batch_label = n_cnt__batch > 1
+      ? ' (batch ' + (n_idx__batch + 1) + '/' + n_cnt__batch + ')'
+      : '';
 
-  // stream stderr to get real-time progress from python script
-  // must read both stdout and stderr concurrently to avoid pipe buffer deadlock
-  let o_child = o_command.spawn();
-  let o_decoder = new TextDecoder();
+    console.log(`Running pose estimation on ${a_s_path.length} images...${s_batch_label}`);
+    if(f_on_progress) f_on_progress('loading AI models...' + s_batch_label);
 
-  let a_n_byte__stderr = [];
-  let o_reader__stderr = o_child.stderr.getReader();
-  let s_line_buf = '';
+    let o_command = new Deno.Command("python3", {
+      args: [s_path_script, '--model-dir', s_path_model_dir, ...a_s_path],
+      stdout: "piped",
+      stderr: "piped",
+    });
 
-  let f_read_stderr = async function(){
-    while(true){
-      let { done, value } = await o_reader__stderr.read();
-      if(done) break;
-      a_n_byte__stderr.push(value);
-      s_line_buf += o_decoder.decode(value, { stream: true });
-      let a_s_line = s_line_buf.split('\n');
-      s_line_buf = a_s_line.pop();
-      for(let s_line of a_s_line){
-        let s_trimmed = s_line.trim();
-        if(s_trimmed.length > 0){
-          console.log('Python:', s_trimmed);
-          if(f_on_progress && s_trimmed.startsWith('Processing ')){
-            f_on_progress('pose estimation: ' + s_trimmed);
+    // stream stderr to get real-time progress from python script
+    // must read both stdout and stderr concurrently to avoid pipe buffer deadlock
+    let o_child = o_command.spawn();
+    let o_decoder = new TextDecoder();
+
+    let a_n_byte__stderr = [];
+    let o_reader__stderr = o_child.stderr.getReader();
+    let s_line_buf = '';
+
+    let f_read_stderr = async function(){
+      while(true){
+        let { done, value } = await o_reader__stderr.read();
+        if(done) break;
+        a_n_byte__stderr.push(value);
+        s_line_buf += o_decoder.decode(value, { stream: true });
+        let a_s_line = s_line_buf.split('\n');
+        s_line_buf = a_s_line.pop();
+        for(let s_line of a_s_line){
+          let s_trimmed = s_line.trim();
+          if(s_trimmed.length > 0){
+            console.log('Python:', s_trimmed);
+            if(f_on_progress && s_trimmed.startsWith('Processing ')){
+              f_on_progress('pose estimation: ' + s_trimmed + s_batch_label);
+            }
           }
         }
       }
-    }
-  };
+    };
 
-  let a_n_byte__stdout = [];
-  let o_reader__stdout = o_child.stdout.getReader();
+    let a_n_byte__stdout = [];
+    let o_reader__stdout = o_child.stdout.getReader();
 
-  let f_read_stdout = async function(){
-    while(true){
-      let { done, value } = await o_reader__stdout.read();
-      if(done) break;
-      a_n_byte__stdout.push(value);
-    }
-  };
-
-  let [_, __, o_status] = await Promise.all([f_read_stderr(), f_read_stdout(), o_child.status]);
-
-  if(!o_status.success){
-    let s_stderr = a_n_byte__stderr.map(function(v){ return o_decoder.decode(v); }).join('');
-    throw new Error('Python pose estimation failed: ' + s_stderr);
-  }
-
-  let s_stdout = a_n_byte__stdout.map(function(v){ return o_decoder.decode(v); }).join('').trim();
-  let o_result_json = JSON.parse(s_stdout);
-
-  // store results in db
-  let n_len__result = o_result_json.results.length;
-  for(let n_idx = 0; n_idx < n_len__result; n_idx++){
-    let o_result = o_result_json.results[n_idx];
-    if(!o_result.success) continue;
-    if(f_on_progress) f_on_progress('storing results: ' + (n_idx + 1) + '/' + n_len__result);
-
-    // find the matching o_image by path
-    let o_image = a_o_image__to_process.find(function(o){
-      return o.s_path_absolute === o_result.image_path;
-    });
-    if(!o_image) continue;
-
-    // each person detected becomes one o_pose
-    for(let o_person of o_result.people){
-      let o_pose = f_o_model_instance(o_model__o_pose, {
-        n_id: null,
-        n_o_image_n_id: o_image.n_id,
-      });
-      let o_pose__created = f_v_crud__indb('create', o_model__o_pose, o_pose);
-
-      let a_o_posekeypoint = [];
-      for(let o_kp of o_person.keypoints){
-        let o_posekeypoint = f_o_model_instance(o_model__o_posekeypoint, {
-          n_id: null,
-          n_o_pose_n_id: o_pose__created.n_id,
-          s_name: o_kp.name,
-          n_trn_x: o_kp.x,
-          n_trn_y: o_kp.y,
-          n_confidence: o_kp.confidence,
-        });
-        let o_posekeypoint__created = f_v_crud__indb('create', o_model__o_posekeypoint, o_posekeypoint);
-        a_o_posekeypoint.push(o_posekeypoint__created);
+    let f_read_stdout = async function(){
+      while(true){
+        let { done, value } = await o_reader__stdout.read();
+        if(done) break;
+        a_n_byte__stdout.push(value);
       }
+    };
 
-      o_pose__created.a_o_posekeypoint = a_o_posekeypoint;
-      a_o_pose__result.push(o_pose__created);
+    let [_, __, o_status] = await Promise.all([f_read_stderr(), f_read_stdout(), o_child.status]);
+
+    if(!o_status.success){
+      let s_stderr = a_n_byte__stderr.map(function(v){ return o_decoder.decode(v); }).join('');
+      throw new Error('Python pose estimation failed: ' + s_stderr);
+    }
+
+    let s_stdout = a_n_byte__stdout.map(function(v){ return o_decoder.decode(v); }).join('').trim();
+    let o_result_json = JSON.parse(s_stdout);
+
+    // store results in db
+    let n_len__result = o_result_json.results.length;
+    for(let n_idx = 0; n_idx < n_len__result; n_idx++){
+      let o_result = o_result_json.results[n_idx];
+      if(!o_result.success) continue;
+      if(f_on_progress) f_on_progress('storing results: ' + (n_idx + 1) + '/' + n_len__result + s_batch_label);
+
+      // find the matching o_image by path
+      let o_image = a_o_image__batch.find(function(o){
+        return o.s_path_absolute === o_result.image_path;
+      });
+      if(!o_image) continue;
+
+      // each person detected becomes one o_pose
+      for(let o_person of o_result.people){
+        let o_pose = f_o_model_instance(o_model__o_pose, {
+          n_id: null,
+          n_o_image_n_id: o_image.n_id,
+        });
+        let o_pose__created = f_v_crud__indb('create', o_model__o_pose, o_pose);
+
+        let a_o_posekeypoint = [];
+        for(let o_kp of o_person.keypoints){
+          let o_posekeypoint = f_o_model_instance(o_model__o_posekeypoint, {
+            n_id: null,
+            n_o_pose_n_id: o_pose__created.n_id,
+            s_name: o_kp.name,
+            n_trn_x: o_kp.x,
+            n_trn_y: o_kp.y,
+            n_confidence: o_kp.confidence,
+          });
+          let o_posekeypoint__created = f_v_crud__indb('create', o_model__o_posekeypoint, o_posekeypoint);
+          a_o_posekeypoint.push(o_posekeypoint__created);
+        }
+
+        o_pose__created.a_o_posekeypoint = a_o_posekeypoint;
+        a_o_pose__result.push(o_pose__created);
+      }
     }
   }
 

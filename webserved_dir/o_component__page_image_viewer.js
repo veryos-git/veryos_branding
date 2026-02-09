@@ -156,7 +156,7 @@ let o_component__page_image_viewer = {
         return {
             o_state__ws: o_state__ws,
             a_o_image: [],
-            n_sz__range: 100,
+            n_sz__range: 500,
             n_idx__range: 0,
             n_idx__current: 0,
             b_loading: false,
