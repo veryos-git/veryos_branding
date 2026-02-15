@@ -111,19 +111,12 @@ let f_connect = async function() {
     });
 };
 
-
 await f_connect();
-
-
 
 let o_router = createRouter({
     history: createWebHashHistory(),
     routes: o_state.a_o_route,
 });
-
-
-
-
 
 
 globalThis.o_state = o_state;
