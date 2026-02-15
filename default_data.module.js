@@ -1,7 +1,8 @@
 import { f_v_crud__indb } from "./database_functions.module.js";
 import {
     a_o_model,
-    f_s_name_foreign_key__from_o_model
+    f_s_name_foreign_key__from_o_model,
+    f_s_name_table__from_o_model,
 } from "./webserved_dir/constructors.module.js";
 
 let a_o_data_default = [
@@ -60,12 +61,13 @@ let f_ensure_default_data = function(){
         if(o_cache[s_key]){
             return o_cache[s_key];
         }
-        let a_o_existing = f_v_crud__indb('read', o_model, o_data_plain);
+        let s_name_table = f_s_name_table__from_o_model(o_model);
+        let a_o_existing = f_v_crud__indb('read', s_name_table, o_data_plain);
         let o_instance = null;
         if(a_o_existing && a_o_existing.length > 0){
             o_instance = a_o_existing[0];
         } else {
-            o_instance = f_v_crud__indb('create', o_model, o_data_plain);
+            o_instance = f_v_crud__indb('create', s_name_table, o_data_plain);
         }
         o_cache[s_key] = o_instance;
         return o_instance;

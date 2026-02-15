@@ -7,6 +7,9 @@ import {
     f_o_model_instance,
     s_name_prop_id,
     f_a_s_error__invalid_model_instance,
+    f_o_model__from_s_name_table,
+    s_name_prop_ts_created,
+    s_name_prop_ts_updated,
 } from "./webserved_dir/constructors.module.js";
 import { s_ds, s_root_dir } from "./runtimedata.module.js";
 import { f_ensure_default_data } from "./default_data.module.js";
@@ -66,27 +69,47 @@ let f_db_delete_table_data = function(s_name_table){
 }
 let f_v_crud__indb = function(
     s_name_crud_function,
-    o_model,
+    s_name_table,
     v_o_data,
     v_o_data_update
 ){
-    let s_name_table = f_s_name_table__from_o_model(o_model);
+    let o_model = f_o_model__from_s_name_table(s_name_table);
+    if(!o_model) throw new Error(`Model not found for table ${s_name_table}`);
     let v_return = null;
     
-    let a_s_error = f_a_s_error__invalid_model_instance(o_model, v_o_data);
-    if(a_s_error.length > 0){
-        throw new Error('Invalid model instance: ' + a_s_error.join('; '));
+    if(v_o_data){
+
+        let a_s_error = f_a_s_error__invalid_model_instance(o_model, v_o_data);
+        if(a_s_error.length > 0){
+            throw new Error('Invalid model instance: ' + a_s_error.join('; '));
+        }
+    }
+
+    // check if timestamps exist on the model
+    if(s_name_crud_function === 'create' || s_name_crud_function === 'update'){
+        v_o_data[s_name_prop_ts_created] = Date.now();
+        v_o_data[s_name_prop_ts_updated] = Date.now();
+    }
+    if(s_name_crud_function === 'update'){
+        v_o_data_update[s_name_prop_ts_updated] = Date.now();
     }
 
     // validate values
-    let o_model_instance = f_o_model_instance(o_model, v_o_data);
-    let a_s_name_property = Object.keys(o_model_instance);
-    let a_v_value = Object.values(o_model_instance);
+    let o_model_instance = null; 
+    let a_s_name_property = null;
+    let a_v_value = null;
+    if(v_o_data){
+
+        o_model_instance = f_o_model_instance(o_model, v_o_data);
+        a_s_name_property = Object.keys(o_model_instance);
+        a_v_value = Object.values(o_model_instance);
+    }
 
     if (s_name_crud_function === 'create') {
         // v_o_data should be an instance of o_model
         let s_sql = `INSERT INTO ${s_name_table} (${a_s_name_property.join(', ')}) VALUES (${a_s_name_property.map(function() { return '?'; }).join(', ')})`;
         o_db.prepare(s_sql).run(...a_v_value);
+
 
         let o_last = o_db.prepare('SELECT last_insert_rowid() as n_id').get();
         v_return = o_db.prepare(`SELECT * FROM ${s_name_table} WHERE n_id = ?`).get(o_last.n_id)
@@ -142,9 +165,23 @@ let f_v_crud__indb = function(
     return v_return;
 };
 
+let f_v_read_or_create_byid__fromdb = async function(o_moel, o_instance){
+    if(!o_model_instance[s_name_prop_id]) throw new Error(`id property (${s_name_prop_id}) is required for read_or_create_byid`);
+
+    let o_instance__fromdb = f_v_crud__indb('read', o_model, {
+        [s_name_prop_id]: o_model_instance[s_name_prop_id],
+    })[0];
+
+    if(o_instance__fromdb) return o_instance__fromdb;
+
+    return f_v_crud__indb('create', o_model, o_instance);
+
+}
+
 
 export {
     f_init_db,
     f_v_crud__indb,
     f_db_delete_table_data,
+    f_v_read_or_create_byid__fromdb
 };

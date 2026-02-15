@@ -33,14 +33,19 @@ let f_a_s_error__invalid_model_instance = function(
     o_instance
 ){
     let a_s_error = [];
+    // console.log(o_instance)
     for(let o_model_prop of o_model.a_o_property){
         let value = o_instance[o_model_prop.s_name];
-        let b_valid = o_model_prop.f_b_val_valid(value);
-        if(!b_valid){
-            let s_error = `Invalid value for property ${o_model_prop.s_name}: ${value}
-            validator function is: ${o_model_prop.f_b_val_valid.toString()}
-            got value : ${value} of type ${typeof value}`;
-            a_s_error.push(s_error);
+        // if the property has a validation function, check if the value is valid
+        let b_valid = true;
+        if(o_model_prop.f_b_val_valid){
+            b_valid = o_model_prop.f_b_val_valid(value);
+            if(!b_valid){
+                let s_error = `Invalid value for property ${o_model_prop.s_name}: ${value}
+                validator function is: ${o_model_prop.f_b_val_valid.toString()}
+                got value : ${value} of type ${typeof value}`;
+                a_s_error.push(s_error);
+            }
         }
     }
     // check if instance has property that is not in model
@@ -125,11 +130,22 @@ let o_model__o_wsclient = f_o_model({
     s_name: 'o_wsclient',
     a_o_property: [
         f_o_model_prop__default_id(s_name_prop_id),
-        f_o_property('ip', 'string', (s)=>{return s!==''}),
+        f_o_property('s_ip', 'string', (s)=>{return s!==''}),
         f_o_model_prop__timestamp_default(s_name_prop_ts_created),
         f_o_model_prop__timestamp_default(s_name_prop_ts_updated),
     ]
 })
+let f_o_toast = function(
+    s_message, 
+    n_ts_ms_created,
+    n_ttl_ms
+){
+    return {
+        s_message,
+        n_ts_ms_created,
+        n_ttl_ms
+    }
+}
 
 let a_o_model = [
     o_model__o_student,
@@ -138,6 +154,48 @@ let a_o_model = [
     o_model__o_wsclient
 ];
 
+
+let f_o_sfunexposed = function(
+    s_name, 
+    s_f
+){
+    return {
+        s_name, 
+        s_f
+    }
+}
+let o_sfunexposed__deno_copy_file = f_o_sfunexposed(
+    'deno_copy_file',
+    `return await Deno.copyFile(...a_v_arg)`
+);
+let o_sfunexposed__deno_stat = f_o_sfunexposed(
+    'deno_stat',
+    `return await Deno.stat(...a_v_arg)`
+);
+let o_sfunexposed__deno_mkdir = f_o_sfunexposed(
+    'deno_mkdir',
+    `return await Deno.mkdir(...a_v_arg)`
+);
+let o_sfunexposed__f_v_crud__indb = f_o_sfunexposed(
+    'f_v_crud__indb',
+    `return await f_v_crud__indb(...a_v_arg)`
+)
+let a_o_sfunexposed = [
+    o_sfunexposed__deno_copy_file,
+    o_sfunexposed__deno_stat,
+    o_sfunexposed__deno_mkdir,
+    o_sfunexposed__f_v_crud__indb,
+]
+let f_o_wsmsg = function(
+    s_type, 
+    v_data
+){  
+    return {
+        s_type,
+        v_data, 
+        s_uuid: crypto.randomUUID(),
+    }
+}
 export {
     o_model__o_student,
     o_model__o_course,
@@ -151,5 +209,12 @@ export {
     s_name_prop_ts_created,
     s_name_prop_ts_updated,
     f_a_s_error__invalid_model_instance,
-    s_name_prop_id
+    s_name_prop_id,
+    f_o_toast,
+    a_o_sfunexposed,
+    o_sfunexposed__deno_copy_file,
+    o_sfunexposed__deno_stat,
+    o_sfunexposed__deno_mkdir,
+    o_sfunexposed__f_v_crud__indb,
+    f_o_wsmsg
 }
