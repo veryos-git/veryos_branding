@@ -65,7 +65,10 @@ let f_init_db = async function(s_path_db = s_path_database) {
 // generic db CRUD
 
 let f_db_delete_table_data = function(s_name_table){
-    return o_db.prepare(`DELETE FROM ${s_name_table}`).run();
+    o_db.exec('PRAGMA foreign_keys = OFF');
+    let v_result = o_db.prepare(`DELETE FROM ${s_name_table}`).run();
+    o_db.exec('PRAGMA foreign_keys = ON');
+    return v_result;
 }
 let f_v_crud__indb = function(
     s_name_crud_function,
@@ -158,7 +161,9 @@ let f_v_crud__indb = function(
         }
         // v_o_data should be an instance of o_model, with n_id property set to the id of the row to delete
         if (!v_o_data || v_o_data.n_id === undefined || v_o_data.n_id === null) return false;
+        o_db.exec('PRAGMA foreign_keys = OFF');
         o_db.prepare(`DELETE FROM ${s_name_table} WHERE n_id = ?`).run(v_o_data.n_id);
+        o_db.exec('PRAGMA foreign_keys = ON');
         v_return = true;
     }
 

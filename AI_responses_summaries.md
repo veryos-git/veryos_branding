@@ -10,3 +10,7 @@
 2026-02-15 - updated all f_v_crud__indb callers to pass s_name_table strings instead of o_model objects (webserver_denojs.js, default_data.module.js)
 2026-02-15 - added toast CSS: fixed bottom-right position, dark background, slide-in animation, fade-out on expired class
 2026-02-15 - added reactive n_ts_ms_now with setInterval to make toast expired class reactive in Vue
+2026-02-16 - implemented delete-all-table-data feature: wired f_delete_table_data sfunexposed to backend, added GUI button with confirm dialog
+2026-02-16 - added colored toast types (info/success/warning/error) and server-side error toasts sent to client on sfunexposed failures
+2026-02-16 - fixed f_delete_instance: defined s_name_table from o_model, passed o_instance instead of undefined o_data, splice from array instead of push
+2026-02-16 - disabled FK constraints around deletes (PRAGMA foreign_keys OFF/ON) in both f_db_delete_table_data and CRUD delete

@@ -12,6 +12,7 @@ import {
     s_name_prop_ts_created,
     s_name_prop_ts_updated,
     o_sfunexposed__f_v_crud__indb,
+    o_sfunexposed__f_delete_table_data,
     f_o_wsmsg
 } from './constructors.module.js';
 
@@ -78,6 +79,13 @@ let o_component__data = {
                 ]
             },
             {
+                's_tag': "button",
+                'v-if': "o_model",
+                'class': "btn__clear_table",
+                'v-on:click': "f_clear_table",
+                'innerText': "Delete all data",
+            },
+            {
                 s_tag: "table",
                 'v-if': "o_model",
                 'class': "a_o_model_data_table",
@@ -140,19 +148,30 @@ let o_component__data = {
             this.o_instance__new = {};
         },
         f_clear_table: async function() {
-
+            let o_self = this;
+            let s_name_table = f_s_name_table__from_o_model(o_self.o_model);
+            if(!confirm(`Delete all data from ${s_name_table}?`)) return;
+            let o_resp = await f_send_wsmsg_with_response(
+                f_o_wsmsg(
+                    o_sfunexposed__f_delete_table_data.s_name,
+                    [s_name_table]
+                )
+            );
+            o_state[s_name_table] = [];
         },
         f_delete_instance: async function(o_instance) {
             let o_self = this;
-
+            let s_name_table = f_s_name_table__from_o_model(o_self.o_model);
             let o_resp = await f_send_wsmsg_with_response(
                 f_o_wsmsg(
                     o_sfunexposed__f_v_crud__indb.s_name,
-                    ['delete', s_name_table, o_data]
+                    ['delete', s_name_table, o_instance]
                 )
             );
-            o_state[s_name_table].push(o_resp.v_result);
-
+            if(o_resp.v_result){
+                let n_idx = o_state[s_name_table].findIndex(function(o){ return o.n_id === o_instance.n_id; });
+                if(n_idx !== -1) o_state[s_name_table].splice(n_idx, 1);
+            }
         },
         f_create_instance: async function() {
             let o_self = this;

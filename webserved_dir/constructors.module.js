@@ -137,11 +137,13 @@ let o_model__o_wsclient = f_o_model({
 })
 let f_o_toast = function(
     s_message, 
+    s_type, // info (blue), success (green), warning (yellow), error (red)
     n_ts_ms_created,
     n_ttl_ms
 ){
     return {
         s_message,
+        s_type, 
         n_ts_ms_created,
         n_ttl_ms
     }
@@ -180,11 +182,16 @@ let o_sfunexposed__f_v_crud__indb = f_o_sfunexposed(
     'f_v_crud__indb',
     `return await f_v_crud__indb(...a_v_arg)`
 )
+let o_sfunexposed__f_delete_table_data = f_o_sfunexposed(
+    'f_delete_table_data',
+    `return await f_delete_table_data(...a_v_arg)`
+)
 let a_o_sfunexposed = [
     o_sfunexposed__deno_copy_file,
     o_sfunexposed__deno_stat,
     o_sfunexposed__deno_mkdir,
     o_sfunexposed__f_v_crud__indb,
+    o_sfunexposed__f_delete_table_data,
 ]
 let f_o_wsmsg = function(
     s_type, 
@@ -216,5 +223,6 @@ export {
     o_sfunexposed__deno_stat,
     o_sfunexposed__deno_mkdir,
     o_sfunexposed__f_v_crud__indb,
-    f_o_wsmsg
+    o_sfunexposed__f_delete_table_data,
+    f_o_wsmsg,
 }

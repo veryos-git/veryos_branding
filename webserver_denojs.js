@@ -168,10 +168,11 @@ let f_handler = async function(o_request, o_conninfo) {
                         'toast',
                         f_o_toast(
                             a_s_msg_annoying[Math.floor(Math.random() * a_s_msg_annoying.length)],
+                            'info',
                             Date.now(),
                             5000
                         )
-                    )   
+                    )
                 ))
              }, 5000);
 
@@ -185,15 +186,26 @@ let f_handler = async function(o_request, o_conninfo) {
                 try {
                     let a_v_arg = Array.isArray(o_data.v_data) ? o_data.v_data : [];
                     let AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-                    let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'Deno', '...a_v_arg', o_sfunexposed.s_f);
-                    let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, Deno, ...a_v_arg);
-                    o_socket.send(JSON.stringify({ 
+                    let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'f_delete_table_data', 'Deno', '...a_v_arg', o_sfunexposed.s_f);
+                    let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, f_db_delete_table_data, Deno, ...a_v_arg);
+                    o_socket.send(JSON.stringify({
                         v_result,
                         s_uuid: o_data.s_uuid,
                      }));
                 } catch (o_error) {
                     console.error('Error in exposed function:', o_sfunexposed.s_name, o_error);
                     o_socket.send(JSON.stringify({ error: o_error.message, s_uuid: o_data.s_uuid }));
+                    o_socket.send(JSON.stringify(
+                        f_o_wsmsg(
+                            'toast',
+                            f_o_toast(
+                                `${o_sfunexposed.s_name}: ${o_error.message}`,
+                                'error',
+                                Date.now(),
+                                8000
+                            )
+                        )
+                    ));
                 }
             }
             if(o_data.s_type === 'hello_from_client'){
@@ -222,8 +234,8 @@ let f_handler = async function(o_request, o_conninfo) {
             let o_data = await o_request.json();
             let a_v_arg = Array.isArray(o_data.v_data) ? o_data.v_data : [];
             let AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-            let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'Deno', '...a_v_arg', o_sfunexposed.s_f);
-            let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, Deno, ...a_v_arg);
+            let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'f_delete_table_data', 'Deno', '...a_v_arg', o_sfunexposed.s_f);
+            let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, f_db_delete_table_data, Deno, ...a_v_arg);
             return new Response(JSON.stringify({ v_result }), {
                 headers: { 'content-type': 'application/json' },
             });

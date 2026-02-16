@@ -32,7 +32,7 @@ let o_state = reactive({
     a_o_student: [],
     o_course_o_student: [],
     a_o_toast: [
-        f_o_toast('Welcome to the app!', Date.now(), 5000),
+        f_o_toast('Welcome to the app!', 'success', Date.now(), 5000),
     ],
     n_ts_ms_now: Date.now(),
 });
@@ -153,7 +153,7 @@ let o_app = createApp({
                             s_tag: "div",
                             class: "o_toast",
                             'v-for': "o_toast in a_o_toast",
-                            ':class': "{ expired: n_ts_ms_now > o_toast.n_ts_ms_created + o_toast.n_ttl_ms }",
+                            ':class': "[o_toast.s_type, { expired: n_ts_ms_now > o_toast.n_ts_ms_created + o_toast.n_ttl_ms }]",
                             innerText: "{{ o_toast.s_message }}",
                         }
                     ]
