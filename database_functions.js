@@ -1,3 +1,4 @@
+// Copyright (C) [2026] [Jonas Immanuel Frey] - Licensed under GPLv2. See LICENSE file for details.
 
 import { Database } from "jsr:@db/sqlite@0.11";
 import {
@@ -10,13 +11,13 @@ import {
     f_o_model__from_s_name_table,
     s_name_prop_ts_created,
     s_name_prop_ts_updated,
-} from "./webserved_dir/constructors.module.js";
-import { s_ds, s_root_dir } from "./runtimedata.module.js";
-import { f_ensure_default_data } from "./default_data.module.js";
+} from "./webserved_dir/constructors.js";
+import { s_ds, s_root_dir } from "./runtimedata.js";
+import { f_ensure_default_data } from "./default_data.js";
 
 let o_db = null;
 
-let s_path_database = './.gitignored/app.db';
+let s_path_database = Deno.env.get('DB_PATH') ?? './.gitignored/app.db';
 
 
 let f_init_db = async function(s_path_db = s_path_database) {
@@ -65,6 +66,8 @@ let f_init_db = async function(s_path_db = s_path_database) {
 // generic db CRUD
 
 let f_db_delete_table_data = function(s_name_table){
+    let o_model = f_o_model__from_s_name_table(s_name_table);
+    if(!o_model) throw new Error(`Unknown table: ${s_name_table}`);
     o_db.exec('PRAGMA foreign_keys = OFF');
     let v_result = o_db.prepare(`DELETE FROM ${s_name_table}`).run();
     o_db.exec('PRAGMA foreign_keys = ON');
@@ -88,8 +91,8 @@ let f_v_crud__indb = function(
         }
     }
 
-    // check if timestamps exist on the model
-    if(s_name_crud_function === 'create' || s_name_crud_function === 'update'){
+    // set timestamps
+    if(s_name_crud_function === 'create'){
         v_o_data[s_name_prop_ts_created] = Date.now();
         v_o_data[s_name_prop_ts_updated] = Date.now();
     }
@@ -139,20 +142,17 @@ let f_v_crud__indb = function(
     }
 
     if (s_name_crud_function === 'update') {
-        // v_o_data should be an instance of o_model, with n_id property set to the id of the row to update
-        // v_o_data_update should be an object with the properties to update
-        if(!a_s_name_property.includes(s_name_prop_id)){
+        // v_o_data identifies the record (must have n_id)
+        // v_o_data_update has the fields to change
+        if(!v_o_data || v_o_data[s_name_prop_id] === undefined || v_o_data[s_name_prop_id] === null){
             throw new Error(`id property (${s_name_prop_id}) is required for update`);
         }
-        let a_s_error = f_a_s_error__invalid_model_instance(o_model, v_o_data_update);
-        if(a_s_error.length > 0){
-            throw new Error('Invalid model instance: ' + a_s_error.join('; '));
-        }
-
+        let a_s_name_prop__update = Object.keys(v_o_data_update);
+        let a_v_value__update = Object.values(v_o_data_update);
+        let a_s_set = a_s_name_prop__update.map(function(s_key) { return `${s_key} = ?`; });
         let s_sql = `UPDATE ${s_name_table} SET ${a_s_set.join(', ')} WHERE ${s_name_prop_id} = ?`;
-        o_db.prepare(s_sql).run(...a_v_value);
-
-        v_return = o_db.prepare(`SELECT * FROM ${s_name_table} WHERE n_id = ?`).get(v_o_data.n_id)
+        o_db.prepare(s_sql).run(...a_v_value__update, v_o_data[s_name_prop_id]);
+        v_return = o_db.prepare(`SELECT * FROM ${s_name_table} WHERE n_id = ?`).get(v_o_data[s_name_prop_id]);
     }
 
     if (s_name_crud_function === 'delete') {

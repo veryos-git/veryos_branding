@@ -1,3 +1,5 @@
+// Copyright (C) [2026] [Jonas Immanuel Frey] - Licensed under GPLv2. See LICENSE file for details.
+
 let s_name_prop_ts_created = 'n_ts_ms_created';
 let s_name_prop_ts_updated = 'n_ts_ms_updated';
 let s_name_prop_id = 'n_id';

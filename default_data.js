@@ -1,9 +1,11 @@
-import { f_v_crud__indb } from "./database_functions.module.js";
+// Copyright (C) [2026] [Jonas Immanuel Frey] - Licensed under GPLv2. See LICENSE file for details.
+
+import { f_v_crud__indb } from "./database_functions.js";
 import {
     a_o_model,
     f_s_name_foreign_key__from_o_model,
     f_s_name_table__from_o_model,
-} from "./webserved_dir/constructors.module.js";
+} from "./webserved_dir/constructors.js";
 
 let a_o_data_default = [
     {

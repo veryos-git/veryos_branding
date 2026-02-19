@@ -1,9 +1,9 @@
-
+// Copyright (C) [2026] [Jonas Immanuel Frey] - Licensed under GPLv2. See LICENSE file for details.
 import {
     f_db_delete_table_data,
     f_init_db,
     f_v_crud__indb,
-} from "./database_functions.module.js";
+} from "./database_functions.js";
 import {
     a_o_model,
     f_o_model__from_s_name_table,
@@ -14,15 +14,16 @@ import {
     f_s_name_table__from_o_model,
     f_o_wsmsg,
     f_o_toast,
-} from "./webserved_dir/constructors.module.js";
+} from "./webserved_dir/constructors.js";
 import {
     s_ds,
     s_root_dir,
-} from "./runtimedata.module.js";
+} from "./runtimedata.js";
 
 f_init_db();
 
-let n_port = 8000;
+let n_port = parseInt(Deno.env.get('PORT') ?? '8000');
+let s_dir__static = Deno.env.get('STATIC_DIR') ?? './webserved_dir';
 
 let f_s_content_type = function(s_path) {
     if (s_path.endsWith('.html')) return 'text/html';
@@ -39,6 +40,8 @@ let f_handler = async function(o_request, o_conninfo) {
     // websocket upgrade
 
     if (o_request.headers.get('upgrade') === 'websocket') {
+        // TODO: implement authentication before upgrading the WebSocket connection
+        // e.g. validate a token from query params or cookies against a secret from .env
         let { socket: o_socket, response: o_response } = Deno.upgradeWebSocket(o_request);
         console.log(o_request)
         const s_ip = o_request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
@@ -273,7 +276,7 @@ let f_handler = async function(o_request, o_conninfo) {
     }
 
     try {
-        let s_path_file = `./webserved_dir${s_path}`.replace(/\//g, s_ds);
+        let s_path_file = `${s_dir__static}${s_path}`.replace(/\//g, s_ds);
         let a_n_byte = await Deno.readFile(s_path_file);
         let s_content_type = f_s_content_type(s_path);
         return new Response(a_n_byte, {

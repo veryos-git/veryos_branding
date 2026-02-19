@@ -1,3 +1,5 @@
+// Copyright (C) [2026] [Jonas Immanuel Frey] - Licensed under GPLv2. See LICENSE file for details.
+
 import { createApp, reactive, markRaw } from 'vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { 
@@ -7,7 +9,7 @@ import {
     o_sfunexposed__f_v_crud__indb,
     a_o_sfunexposed,
     f_o_wsmsg
-} from './constructors.module.js';
+} from './constructors.js';
 
 import {
     f_o_html_from_o_js,
@@ -39,6 +41,7 @@ let o_state = reactive({
 
 let o_socket = null;
 let a_f_handler = [];
+let n_ms__reconnect_delay = 1000;
 
 let f_register_handler = function(f_handler) {
     a_f_handler.push(f_handler);
@@ -99,10 +102,16 @@ let f_connect = async function() {
                 }
             };
 
-            o_socket.onclose = function() {
+            o_socket.onclose = async function() {
                 o_state.s_status = 'disconnected - reconnecting...';
                 o_state.b_connected = false;
-                setTimeout(f_connect, 2000);
+                setTimeout(async function() {
+                    try {
+                        await f_connect();
+                        n_ms__reconnect_delay = 1000;
+                    } catch {}
+                }, n_ms__reconnect_delay);
+                n_ms__reconnect_delay = Math.min(n_ms__reconnect_delay * 2, 30000);
             };
             
         } catch (error) {

@@ -14,3 +14,5 @@
 2026-02-16 - added colored toast types (info/success/warning/error) and server-side error toasts sent to client on sfunexposed failures
 2026-02-16 - fixed f_delete_instance: defined s_name_table from o_model, passed o_instance instead of undefined o_data, splice from array instead of push
 2026-02-16 - disabled FK constraints around deletes (PRAGMA foreign_keys OFF/ON) in both f_db_delete_table_data and CRUD delete
+2026-02-18 - explored project and wrote 15 improvement suggestions to improvements.md
+2026-02-18 - implemented all improvements: .env/.env.example, renamed *.module.js files and webserver_denojs.js, deno.json task runner, local lib imports, exponential WS backoff, full CRUD edit UI, fixed update logic, table validation, auth placeholder, README expansion, deno.lock

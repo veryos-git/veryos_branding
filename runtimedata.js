@@ -1,3 +1,5 @@
+// Copyright (C) [2026] [Jonas Immanuel Frey] - Licensed under GPLv2. See LICENSE file for details.
+
 let s_root_dir = Deno.cwd();
 // directory separator
 let s_ds = '/';
