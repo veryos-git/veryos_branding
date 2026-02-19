@@ -11,7 +11,7 @@ import {
     f_o_model__from_s_name_table,
     s_name_prop_ts_created,
     s_name_prop_ts_updated,
-} from "./webserved_dir/constructors.js";
+} from "./localhost/constructors.js";
 import { s_ds, s_root_dir } from "./runtimedata.js";
 import { f_ensure_default_data } from "./default_data.js";
 

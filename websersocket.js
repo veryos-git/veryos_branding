@@ -14,11 +14,35 @@ import {
     f_s_name_table__from_o_model,
     f_o_wsmsg,
     f_o_toast,
-} from "./webserved_dir/constructors.js";
+} from "./localhost/constructors.js";
 import {
     s_ds,
     s_root_dir,
 } from "./runtimedata.js";
+
+// first-run: generate S_UUID, persist it, and rename this file
+let s_uuid = Deno.env.get('S_UUID');
+if (!s_uuid) {
+    s_uuid = crypto.randomUUID();
+
+    let f_s_append_uuid_to_env = async function(s_path_env) {
+        let s_content = '';
+        try { s_content = await Deno.readTextFile(s_path_env); } catch { /* file may not exist */ }
+        if (s_content.length > 0 && !s_content.endsWith('\n')) s_content += '\n';
+        s_content += `S_UUID=${s_uuid}\n`;
+        await Deno.writeTextFile(s_path_env, s_content);
+    };
+
+    await f_s_append_uuid_to_env(`${s_root_dir}${s_ds}.env`);
+    await f_s_append_uuid_to_env(`${s_root_dir}${s_ds}.env.example`);
+
+    let s_path__self = `${s_root_dir}${s_ds}websersocket.js`;
+    let s_path__self__new = `${s_root_dir}${s_ds}websersocket_${s_uuid}.js`;
+    await Deno.rename(s_path__self, s_path__self__new);
+
+    console.log('initialization done');
+    Deno.exit(0);
+}
 
 f_init_db();
 

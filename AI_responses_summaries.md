@@ -16,3 +16,4 @@
 2026-02-16 - disabled FK constraints around deletes (PRAGMA foreign_keys OFF/ON) in both f_db_delete_table_data and CRUD delete
 2026-02-18 - explored project and wrote 15 improvement suggestions to improvements.md
 2026-02-18 - implemented all improvements: .env/.env.example, renamed *.module.js files and webserver_denojs.js, deno.json task runner, local lib imports, exponential WS backoff, full CRUD edit UI, fixed update logic, table validation, auth placeholder, README expansion, deno.lock
+2026-02-19 - added first-run UUID init in websersocket.js: generates crypto UUID, appends S_UUID to .env and .env.example, renames websersocket.js to websersocket_<uuid>.js, then exits with 'initialization done'

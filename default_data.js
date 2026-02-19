@@ -5,7 +5,7 @@ import {
     a_o_model,
     f_s_name_foreign_key__from_o_model,
     f_s_name_table__from_o_model,
-} from "./webserved_dir/constructors.js";
+} from "./localhost/constructors.js";
 
 let a_o_data_default = [
     {
