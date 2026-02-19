@@ -22,11 +22,11 @@ import {
 } from "./runtimedata.js";
 
 // guard: after initialization the file has a UUID in its name — require deno task
-let b_initialized = /websersocket_[0-9a-f-]{36}\.js$/.test(Deno.mainModule);
-if (b_initialized && !Deno.env.get('B_DENO_TASK')) {
-    console.error('run with `deno task run` to start the server');
-    Deno.exit(1);
-}
+// let b_initialized = /websersocket_[0-9a-f-]{36}\.js$/.test(Deno.mainModule);
+// if (b_initialized && !Deno.env.get('B_DENO_TASK')) {
+//     console.error('run with `deno task run` to start the server');
+//     Deno.exit(1);
+// }
 
 // first-run: generate S_UUID, persist it, update deno.json, rename this file
 let s_uuid = Deno.env.get('S_UUID');
