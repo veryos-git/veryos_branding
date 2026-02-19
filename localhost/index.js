@@ -16,24 +16,26 @@ import {
 } from "https://deno.land/x/handyhelpers@5.4.2/mod.js"
 import { o_component__data } from './o_component__data.js';
 import { o_component__filebrowser } from './o_component__filebrowser.js';
+import { o_component__landing } from './o_component__landing.js';
 
 let o_state = reactive({
     b_loaded: false,
     a_o_route : [
         {
             path: '/',
-            redirect: '/data',
+            name: 'landing',
+            component: markRaw(o_component__landing),
         },
-        {
-            path: '/data',
-            name: 'data',
-            component: markRaw(o_component__data),
-        },
-        {
-            path: '/filebrowser',
-            name: 'filebrowser',
-            component: markRaw(o_component__filebrowser),
-        },
+        // {
+        //     path: '/data',
+        //     name: 'data',
+        //     component: markRaw(o_component__data),
+        // },
+        // {
+        //     path: '/filebrowser',
+        //     name: 'filebrowser',
+        //     component: markRaw(o_component__filebrowser),
+        // },
     ],
     a_o_model,
     a_o_course: [],

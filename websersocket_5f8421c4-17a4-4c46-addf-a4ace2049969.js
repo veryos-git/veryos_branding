@@ -230,6 +230,21 @@ let f_handler = async function(o_request, o_conninfo) {
                     let a_v_arg = Array.isArray(o_data.v_data) ? o_data.v_data : [];
                     let AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
                     let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'f_delete_table_data', 'Deno', 'f_a_o_fsnode__from_path', '...a_v_arg', o_sfunexposed.s_f);
+                    console.log('Executing function:', o_sfunexposed.s_name, 'with arguments:', a_v_arg);
+                    if(a_v_arg[0] != 'read'){
+                    o_socket.send(JSON.stringify(
+                        f_o_wsmsg(
+                            'toast',
+                            f_o_toast(
+                                `permission denied`,
+                                'error',
+                                Date.now(),
+                                8000
+                            )
+                        )
+                    ));
+                        return;
+                    }
                     let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, f_db_delete_table_data, Deno, f_a_o_fsnode__from_path, ...a_v_arg);
                     o_socket.send(JSON.stringify({
                         v_result,
@@ -271,44 +286,44 @@ let f_handler = async function(o_request, o_conninfo) {
     let s_path = o_url.pathname;
 
 
-    let o_sfunexposed = a_o_sfunexposed.find(o=>o.s_name === s_path.slice('/api/'.length));
-    if(o_sfunexposed){
-        try {
-            let o_data = await o_request.json();
-            let a_v_arg = Array.isArray(o_data.v_data) ? o_data.v_data : [];
-            let AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-            let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'f_delete_table_data', 'Deno', '...a_v_arg', o_sfunexposed.s_f);
-            let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, f_db_delete_table_data, Deno, ...a_v_arg);
-            return new Response(JSON.stringify({ v_result }), {
-                headers: { 'content-type': 'application/json' },
-            });
-        } catch (o_error) {
-            console.error('Error in exposed function:', o_sfunexposed.s_name, o_error);
-            return new Response('Error: ' + o_error.message, { status: 500 });
-        }
-    }
+    // let o_sfunexposed = a_o_sfunexposed.find(o=>o.s_name === s_path.slice('/api/'.length));
+    // if(o_sfunexposed){
+    //     try {
+    //         let o_data = await o_request.json();
+    //         let a_v_arg = Array.isArray(o_data.v_data) ? o_data.v_data : [];
+    //         let AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    //         let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'f_delete_table_data', 'Deno', '...a_v_arg', o_sfunexposed.s_f);
+    //         let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, f_db_delete_table_data, Deno, ...a_v_arg);
+    //         return new Response(JSON.stringify({ v_result }), {
+    //             headers: { 'content-type': 'application/json' },
+    //         });
+    //     } catch (o_error) {
+    //         console.error('Error in exposed function:', o_sfunexposed.s_name, o_error);
+    //         return new Response('Error: ' + o_error.message, { status: 500 });
+    //     }
+    // }
 
 
-    // serve file from absolute path
-    if (s_path === '/api/file') {
-        let s_path_file = o_url.searchParams.get('path');
-        if (!s_path_file) {
-            return new Response('Missing path parameter', { status: 400 });
-        }
-        try {
-            let a_n_byte = await Deno.readFile(s_path_file);
-            let s_content_type = 'application/octet-stream';
-            if (s_path_file.endsWith('.jpg') || s_path_file.endsWith('.jpeg')) s_content_type = 'image/jpeg';
-            if (s_path_file.endsWith('.png')) s_content_type = 'image/png';
-            if (s_path_file.endsWith('.gif')) s_content_type = 'image/gif';
-            if (s_path_file.endsWith('.webp')) s_content_type = 'image/webp';
-            return new Response(a_n_byte, {
-                headers: { 'content-type': s_content_type },
-            });
-        } catch {
-            return new Response('File not found', { status: 404 });
-        }
-    }
+    // // serve file from absolute path
+    // if (s_path === '/api/file') {
+    //     let s_path_file = o_url.searchParams.get('path');
+    //     if (!s_path_file) {
+    //         return new Response('Missing path parameter', { status: 400 });
+    //     }
+    //     try {
+    //         let a_n_byte = await Deno.readFile(s_path_file);
+    //         let s_content_type = 'application/octet-stream';
+    //         if (s_path_file.endsWith('.jpg') || s_path_file.endsWith('.jpeg')) s_content_type = 'image/jpeg';
+    //         if (s_path_file.endsWith('.png')) s_content_type = 'image/png';
+    //         if (s_path_file.endsWith('.gif')) s_content_type = 'image/gif';
+    //         if (s_path_file.endsWith('.webp')) s_content_type = 'image/webp';
+    //         return new Response(a_n_byte, {
+    //             headers: { 'content-type': s_content_type },
+    //         });
+    //     } catch {
+    //         return new Response('File not found', { status: 404 });
+    //     }
+    // }
 
     // serve static file
     if (s_path === '/') {

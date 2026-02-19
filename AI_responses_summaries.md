@@ -28,3 +28,7 @@
 2026-02-19 - added file browser page: sfunexposed f_a_o_fsnode__from_path in constructors.js, o_component__filebrowser.js with path persistence in a_o_keyvalpair db, /filebrowser route, compact dark list CSS
 2026-02-19 - wired f_a_o_fsnode__from_path from functions.js: added imports to functions.js (s_ds, f_o_model_instance, o_model__o_fsnode), imported in server, injected into both AsyncFunction call sites
 2026-02-19 - revised o_component__filebrowser: moved f_s_path_parent(s_path, s_ds) to localhost/functions.js, added s_ds to server init message and o_state, rewrote template with f_o_html_from_o_js, renamed s_path→s_path_absolute with s_ds as data property
+2026-02-19 - created landing.html: standalone matrix rain canvas + centered word-by-word typewriter animation for 'building code, that lasts'
+2026-02-19 - created o_component__landing.js Vue component with matrix rain + typewriter words; registered as default '/' route replacing redirect
+2026-02-19 - landing page: added fixed 'VeryOS' title top-center with blue-white glow; reduced word font size; title uses different color from green words
+2026-02-19 - landing: converted template to f_o_html_from_o_js (aifix); added hidden 'VeryOS' word flashing horizontally or vertically in matrix rain ~every 6s in blue-white
