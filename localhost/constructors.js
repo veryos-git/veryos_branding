@@ -126,8 +126,6 @@ let o_model__o_course_o_student = f_o_model({
         f_o_model_prop__timestamp_default(s_name_prop_ts_updated),
     ]
 })
-
-
 let o_model__o_wsclient = f_o_model({
     s_name: 'o_wsclient',
     a_o_property: [
@@ -137,6 +135,35 @@ let o_model__o_wsclient = f_o_model({
         f_o_model_prop__timestamp_default(s_name_prop_ts_updated),
     ]
 })
+let o_model__o_fsnode = f_o_model({
+    s_name: 'o_fsnode',
+    a_o_property: [
+        f_o_model_prop__default_id(s_name_prop_id),
+        f_o_model_prop__default_id('n_o_fsnode_n_id'),
+        f_o_property('n_bytes', 'number'),
+        f_o_property('s_name', 'string', (s)=>{return s!==''}),
+        f_o_property('s_path_absolute', 'string', (s)=>{return s!==''}),
+        f_o_property('b_folder', 'boolean', (b)=>{return typeof b === 'boolean'}),
+        f_o_property('b_image', 'boolean'),
+        f_o_property('b_video', 'boolean'),
+        f_o_model_prop__timestamp_default(s_name_prop_ts_created),
+        f_o_model_prop__timestamp_default(s_name_prop_ts_updated),
+    ]
+});
+let o_model__o_keyvalpair = f_o_model({
+    // a generic key-value pair model that ca be used for
+    // config data 
+    // temporary data storage
+    s_name: 'o_keyvalpair',
+    a_o_property: [
+        f_o_model_prop__default_id('n_id'),
+        f_o_property('s_key', 'string', (s)=>{return s!==''}),
+        f_o_property('s_value', 'string', (s)=>{return s!==''}),
+        f_o_model_prop__timestamp_default(s_name_prop_ts_created),
+        f_o_model_prop__timestamp_default(s_name_prop_ts_updated),
+    ]
+});
+
 let f_o_toast = function(
     s_message, 
     s_type, // info (blue), success (green), warning (yellow), error (red)
@@ -155,7 +182,9 @@ let a_o_model = [
     o_model__o_student,
     o_model__o_course,
     o_model__o_course_o_student, 
-    o_model__o_wsclient
+    o_model__o_wsclient, 
+    o_model__o_fsnode,
+    o_model__o_keyvalpair
 ];
 
 
@@ -188,12 +217,17 @@ let o_sfunexposed__f_delete_table_data = f_o_sfunexposed(
     'f_delete_table_data',
     `return await f_delete_table_data(...a_v_arg)`
 )
+let o_sfunexposed__f_a_o_fsnode__from_path = f_o_sfunexposed(
+    'f_a_o_fsnode__from_path',
+    `return await f_a_o_fsnode__from_path(...a_v_arg)`
+)
 let a_o_sfunexposed = [
     o_sfunexposed__deno_copy_file,
     o_sfunexposed__deno_stat,
     o_sfunexposed__deno_mkdir,
     o_sfunexposed__f_v_crud__indb,
     o_sfunexposed__f_delete_table_data,
+    o_sfunexposed__f_a_o_fsnode__from_path,
 ]
 let f_o_wsmsg = function(
     s_type, 
@@ -210,6 +244,8 @@ export {
     o_model__o_course,
     o_model__o_course_o_student,
     o_model__o_wsclient,
+    o_model__o_fsnode,
+    o_model__o_keyvalpair,
     a_o_model,
     f_s_name_table__from_o_model,
     f_s_name_foreign_key__from_o_model,
@@ -226,5 +262,6 @@ export {
     o_sfunexposed__deno_mkdir,
     o_sfunexposed__f_v_crud__indb,
     o_sfunexposed__f_delete_table_data,
+    o_sfunexposed__f_a_o_fsnode__from_path,
     f_o_wsmsg,
 }

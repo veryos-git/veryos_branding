@@ -4,6 +4,7 @@ import {
     f_init_db,
     f_v_crud__indb,
 } from "./database_functions.js";
+import { f_a_o_fsnode__from_path } from "./functions.js";
 import {
     a_o_model,
     f_o_model__from_s_name_table,
@@ -20,7 +21,14 @@ import {
     s_root_dir,
 } from "./runtimedata.js";
 
-// first-run: generate S_UUID, persist it, and rename this file
+// guard: after initialization the file has a UUID in its name — require deno task
+let b_initialized = /websersocket_[0-9a-f-]{36}\.js$/.test(Deno.mainModule);
+if (b_initialized && !Deno.env.get('B_DENO_TASK')) {
+    console.error('run with `deno task run` to start the server');
+    Deno.exit(1);
+}
+
+// first-run: generate S_UUID, persist it, update deno.json, rename this file
 let s_uuid = Deno.env.get('S_UUID');
 if (!s_uuid) {
     s_uuid = crypto.randomUUID();
@@ -35,6 +43,13 @@ if (!s_uuid) {
 
     await f_s_append_uuid_to_env(`${s_root_dir}${s_ds}.env`);
     await f_s_append_uuid_to_env(`${s_root_dir}${s_ds}.env.example`);
+
+    let o_deno_json = JSON.parse(await Deno.readTextFile(`${s_root_dir}${s_ds}deno.json`));
+    o_deno_json.tasks = {
+        run: `B_DENO_TASK=1 deno run --allow-net --allow-read --allow-write --allow-env --allow-ffi --env websersocket_${s_uuid}.js`,
+        test: o_deno_json.tasks.test,
+    };
+    await Deno.writeTextFile(`${s_root_dir}${s_ds}deno.json`, JSON.stringify(o_deno_json, null, 4));
 
     let s_path__self = `${s_root_dir}${s_ds}websersocket.js`;
     let s_path__self__new = `${s_root_dir}${s_ds}websersocket_${s_uuid}.js`;
@@ -96,6 +111,7 @@ let f_handler = async function(o_request, o_conninfo) {
             o_socket.send(JSON.stringify({
                 s_type: 'init',
                 s_root_dir: s_root_dir,
+                s_ds: s_ds,
             }));
 
 
@@ -213,8 +229,8 @@ let f_handler = async function(o_request, o_conninfo) {
                 try {
                     let a_v_arg = Array.isArray(o_data.v_data) ? o_data.v_data : [];
                     let AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-                    let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'f_delete_table_data', 'Deno', '...a_v_arg', o_sfunexposed.s_f);
-                    let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, f_db_delete_table_data, Deno, ...a_v_arg);
+                    let f = new AsyncFunction('f_v_crud__indb', 'f_o_model__from_s_name_table', 'f_delete_table_data', 'Deno', 'f_a_o_fsnode__from_path', '...a_v_arg', o_sfunexposed.s_f);
+                    let v_result = await f(f_v_crud__indb, f_o_model__from_s_name_table, f_db_delete_table_data, Deno, f_a_o_fsnode__from_path, ...a_v_arg);
                     o_socket.send(JSON.stringify({
                         v_result,
                         s_uuid: o_data.s_uuid,

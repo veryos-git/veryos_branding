@@ -17,3 +17,14 @@
 2026-02-18 - explored project and wrote 15 improvement suggestions to improvements.md
 2026-02-18 - implemented all improvements: .env/.env.example, renamed *.module.js files and webserver_denojs.js, deno.json task runner, local lib imports, exponential WS backoff, full CRUD edit UI, fixed update logic, table validation, auth placeholder, README expansion, deno.lock
 2026-02-19 - added first-run UUID init in websersocket.js: generates crypto UUID, appends S_UUID to .env and .env.example, renames websersocket.js to websersocket_<uuid>.js, then exits with 'initialization done'
+2026-02-19 - rewrote bgshader.js to follow coding conventions: const→let, function declarations→variable assignments, renamed all vars with type prefixes and __ qualifier pattern, fixed canvas id 'c'→'background'
+2026-02-19 - init now rewrites deno.json start task with B_DENO_TASK=1 prefix; guard at top of server file errors 'run with deno task' when UUID filename detected but B_DENO_TASK not set; added deno task init entry
+2026-02-19 - reduced deno.json tasks to only 'run' and 'test'; init now writes tasks.run (not tasks.start) and preserves tasks.test
+2026-02-19 - fixed typo in .env and .env.example: STATIC_DIR=./localohst → ./localhost
+2026-02-19 - fixed @vue/devtools-api bare specifier error: added stub lib file and import map entry in index.html
+2026-02-19 - added --allow-ffi to deno task run and test (SQLite library requires FFI); updated init code to write --allow-ffi into generated run task
+2026-02-19 - canvas #background fixed full-screen z-index -1; full dark theme CSS with semi-transparent backdrop-blur panels over shader background
+2026-02-19 - fixed shader mouse alignment: transform u_mouse from [0,1] into centered aspect-corrected uv space; fixed ambient drift and vignette for same space
+2026-02-19 - added file browser page: sfunexposed f_a_o_fsnode__from_path in constructors.js, o_component__filebrowser.js with path persistence in a_o_keyvalpair db, /filebrowser route, compact dark list CSS
+2026-02-19 - wired f_a_o_fsnode__from_path from functions.js: added imports to functions.js (s_ds, f_o_model_instance, o_model__o_fsnode), imported in server, injected into both AsyncFunction call sites
+2026-02-19 - revised o_component__filebrowser: moved f_s_path_parent(s_path, s_ds) to localhost/functions.js, added s_ds to server init message and o_state, rewrote template with f_o_html_from_o_js, renamed s_path→s_path_absolute with s_ds as data property

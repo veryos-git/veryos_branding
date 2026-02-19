@@ -260,6 +260,13 @@ for example 'a_o_person__filtered' is a legit variable. do not try to make up ne
 
 coding_guidelines_end
 ------
+in each file with source code as the very first line (if possible)
+add the comment line `// Copyright (C) [year] [Jonas Immanuel Frey] - Licensed under [license]. See LICENSE file for details`
+
+-----
+When reading source code, if you come accros inline comments beginning with `aifix` (variants: `aifix:`, `aifix :`, `aifix   ` with any spacing). These mark a location that needs special attention. The comment itself describes the issue or desired change; the few lines of code immediately following it are the relevant context to fix.
+
+------
 
 with each answer make a minimal one liner summary of what you did and put it in AI_responses_summaries.md in a format like this for example: 
 2025-02-06 15:53:12 - created frontend page with path string input and gui output

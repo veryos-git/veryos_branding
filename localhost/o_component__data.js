@@ -93,81 +93,89 @@ let o_component__data = {
                 'class': "a_o_model_data_table",
                 a_o: [
                     {
-                        's_tag': "tr",
+                        's_tag': "thead",
                         a_o: [
                             {
-                                'v-for': "o_property of o_model?.a_o_property",
-                                's_tag': "th",
-                                innerText: "{{ o_property.s_name }}",
+                                's_tag': "tr",
+                                a_o: [
+                                    {
+                                        'v-for': "o_property of o_model?.a_o_property",
+                                        's_tag': "th",
+                                        innerText: "{{ o_property.s_name }}",
+                                    },
+                                    {
+                                        's_tag': "th",
+                                        innerText: "actions",
+                                    },
+                                ]
                             },
-                            {
-                                's_tag': "th",
-                                innerText: "actions",
-                            }
                         ]
                     },
                     {
-                        s_tag: 'tr',
-                        'v-for': "o_instance in o_state[f_s_name_table__from_o_model(o_model)]",
-                        class: "o_instance",
+                        's_tag': "tbody",
                         a_o: [
                             {
-                                'v-for': "o_property of o_model?.a_o_property",
-                                's_tag': "td",
+                                s_tag: 'tr',
+                                'v-for': "o_instance in o_state[f_s_name_table__from_o_model(o_model)]",
+                                class: "o_instance",
                                 a_o: [
                                     {
-                                        // show value as text when not editing this row, or when field is auto-managed
-                                        's_tag': "span",
-                                        'v-if': "o_instance__editing?.n_id !== o_instance.n_id || a_s_name_prop__auto.includes(o_property.s_name)",
-                                        innerText: "{{ o_instance[o_property.s_name] }}",
+                                        'v-for': "o_property of o_model?.a_o_property",
+                                        's_tag': "td",
+                                        a_o: [
+                                            {
+                                                // show value as text when not editing this row, or when field is auto-managed
+                                                's_tag': "span",
+                                                'v-if': "o_instance__editing?.n_id !== o_instance.n_id || a_s_name_prop__auto.includes(o_property.s_name)",
+                                                innerText: "{{ o_instance[o_property.s_name] }}",
+                                            },
+                                            {
+                                                // show input when editing this row and field is editable
+                                                's_tag': "input",
+                                                'v-if': "o_instance__editing?.n_id === o_instance.n_id && !a_s_name_prop__auto.includes(o_property.s_name)",
+                                                'v-model': "o_instance__editing[o_property.s_name]",
+                                                ':type': "o_property.s_type === 'number' ? 'number' : 'text'",
+                                                ':step': "o_property.s_type === 'number' ? 'any' : undefined",
+                                            },
+                                        ]
                                     },
                                     {
-                                        // show input when editing this row and field is editable
-                                        's_tag': "input",
-                                        'v-if': "o_instance__editing?.n_id === o_instance.n_id && !a_s_name_prop__auto.includes(o_property.s_name)",
-                                        'v-model': "o_instance__editing[o_property.s_name]",
-                                        ':type': "o_property.s_type === 'number' ? 'number' : 'text'",
-                                        ':step': "o_property.s_type === 'number' ? 'any' : undefined",
+                                        's_tag': "td",
+                                        'class': "td__actions",
+                                        a_o: [
+                                            {
+                                                's_tag': "button",
+                                                'v-if': "o_instance__editing?.n_id !== o_instance.n_id",
+                                                'v-on:click': "f_start_edit(o_instance)",
+                                                'innerText': "edit",
+                                            },
+                                            {
+                                                's_tag': "button",
+                                                'v-if': "o_instance__editing?.n_id !== o_instance.n_id",
+                                                'v-on:click': "f_delete_instance(o_instance)",
+                                                'innerText': "delete",
+                                            },
+                                            {
+                                                's_tag': "button",
+                                                'v-if': "o_instance__editing?.n_id === o_instance.n_id",
+                                                'v-on:click': "f_save_edit",
+                                                'innerText': "save",
+                                            },
+                                            {
+                                                's_tag': "button",
+                                                'v-if': "o_instance__editing?.n_id === o_instance.n_id",
+                                                'v-on:click': "f_cancel_edit",
+                                                'innerText': "cancel",
+                                            },
+                                        ]
                                     },
                                 ]
                             },
-                            {
-                                's_tag': "td",
-                                'class': "td__actions",
-                                a_o: [
-                                    {
-                                        's_tag': "button",
-                                        'v-if': "o_instance__editing?.n_id !== o_instance.n_id",
-                                        'v-on:click': "f_start_edit(o_instance)",
-                                        'innerText': "edit",
-                                    },
-                                    {
-                                        's_tag': "button",
-                                        'v-if': "o_instance__editing?.n_id !== o_instance.n_id",
-                                        'v-on:click': "f_delete_instance(o_instance)",
-                                        'innerText': "delete",
-                                    },
-                                    {
-                                        's_tag': "button",
-                                        'v-if': "o_instance__editing?.n_id === o_instance.n_id",
-                                        'v-on:click': "f_save_edit",
-                                        'innerText': "save",
-                                    },
-                                    {
-                                        's_tag': "button",
-                                        'v-if': "o_instance__editing?.n_id === o_instance.n_id",
-                                        'v-on:click': "f_cancel_edit",
-                                        'innerText': "cancel",
-                                    },
-                                ]
-                            }
                         ]
-                    }
+                    },
                 ]
-            }
-
+            },
         ]
-
     })).outerHTML,
     data: function() {
         return {

@@ -15,6 +15,7 @@ import {
     f_o_html_from_o_js,
 } from "https://deno.land/x/handyhelpers@5.4.2/mod.js"
 import { o_component__data } from './o_component__data.js';
+import { o_component__filebrowser } from './o_component__filebrowser.js';
 
 let o_state = reactive({
     b_loaded: false,
@@ -28,7 +29,12 @@ let o_state = reactive({
             name: 'data',
             component: markRaw(o_component__data),
         },
-    ], 
+        {
+            path: '/filebrowser',
+            name: 'filebrowser',
+            component: markRaw(o_component__filebrowser),
+        },
+    ],
     a_o_model,
     a_o_course: [],
     a_o_student: [],
@@ -88,6 +94,11 @@ let f_connect = async function() {
             o_socket.onmessage = function(o_evt) {
                 let o_data = JSON.parse(o_evt.data);
 
+                if(o_data.s_type === 'init'){
+                    o_state.s_ds = o_data.s_ds;
+                    o_state.s_root_dir = o_data.s_root_dir;
+                    return;
+                }
                 if(o_data?.o_model){
                     let s_name_table = f_s_name_table__from_o_model(o_data.o_model);
                     o_state[s_name_table] = o_data.v_data;
@@ -141,6 +152,10 @@ let o_app = createApp({
         {
             a_o: [
                 {
+                    s_tag: "canvas", 
+                    id: "background"
+                },
+                {
                     class: "nav", 
                     a_o: [
                         {
@@ -171,7 +186,10 @@ let o_app = createApp({
         ]
     }
     )).innerHTML,
-    mounted: function() {
+    mounted: async function() {
+        // Background shader
+        let o_mod_bgshader = await import('./bgshader.js');
+        o_mod_bgshader.f_start();
     },
 });
 globalThis.o_app = o_app;

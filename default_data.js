@@ -5,6 +5,7 @@ import {
     a_o_model,
     f_s_name_foreign_key__from_o_model,
     f_s_name_table__from_o_model,
+    o_model__o_keyvalpair,
 } from "./localhost/constructors.js";
 
 let a_o_data_default = [
@@ -18,6 +19,12 @@ let a_o_data_default = [
         o_student: {
             name: 'Bob',
             o_course: {name: 'Math 101'}
+        }
+    }, 
+    {
+        o_keyvalpair: {
+            s_key: 's_path_absolute__filebrowser',
+            s_value: '/home'
         }
     }
 ]
